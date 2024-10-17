@@ -107,7 +107,10 @@ class FSRS(nn.Module):
 
     def next_d(self, state: Tensor, rating: Tensor) -> Tensor:
         delta_d = - self.w[6] * (rating - 3)
-        new_d = state[:, 1] + delta_d * (1 - (state[:, 1]/10)) # linear dampening
+        if delta_d > 0:
+            new_d = state[:, 1] + delta_d * (1 - (state[:, 1]/10))
+        if delta_d < 0:
+            new_d = state[:, 1] + delta_d * (1 - ((11 - state[:, 1])/10))
         new_d = self.mean_reversion(self.init_d(4), new_d)
         return new_d
 
